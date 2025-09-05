@@ -4,5 +4,7 @@
     "api/**/*.js": {
       "runtime": "@vercel/node@3.0.0"
     }
-  }
+  },
+  "buildCommand": "echo 'No build required'",
+  "outputDirectory": "public"
 }

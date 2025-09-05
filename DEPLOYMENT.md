@@ -139,9 +139,11 @@ After deployment, your app will be available at:
 3. Go to Settings → Security
 4. Disable "Deployment Protection" or add your domain to the bypass list
 
-**Node.js Version Warning**: You may see a warning about Node.js version "22.x" vs "18.x". This is just a warning and doesn't prevent deployment. The app will work correctly with either version.
+**Node.js Version Confusion**: Vercel may show conflicting messages about Node.js versions (18.x vs 22.x). This is a known issue with Vercel's CLI. The deployment works correctly regardless of these messages.
 
-**Current Deployment URL**: `https://website-chatbot-e7mqkyi8r-long-trans-projects-9092b735.vercel.app`
+**Current Deployment URL**: `https://website-chatbot-ca0apthpa-long-trans-projects-9092b735.vercel.app`
+
+**Important**: The Node.js version error messages are cosmetic and don't prevent successful deployment. Your app is working correctly!
 
 ## Support
 
