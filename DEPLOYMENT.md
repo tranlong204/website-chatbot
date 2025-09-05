@@ -141,6 +141,8 @@ After deployment, your app will be available at:
 
 **Node.js Version Warning**: You may see a warning about Node.js version "22.x" vs "18.x". This is just a warning and doesn't prevent deployment. The app will work correctly with either version.
 
+**Current Deployment URL**: `https://website-chatbot-e7mqkyi8r-long-trans-projects-9092b735.vercel.app`
+
 ## Support
 
 If you encounter issues:
