@@ -139,6 +139,8 @@ After deployment, your app will be available at:
 3. Go to Settings → Security
 4. Disable "Deployment Protection" or add your domain to the bypass list
 
+**Node.js Version Warning**: You may see a warning about Node.js version "22.x" vs "18.x". This is just a warning and doesn't prevent deployment. The app will work correctly with either version.
+
 ## Support
 
 If you encounter issues:
