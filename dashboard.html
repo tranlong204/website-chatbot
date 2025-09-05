@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation Dashboard - MindTek AI Assistant</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>MindTek AI - Conversation Dashboard</h1>
+            <div class="header-actions">
+                <button id="refresh-btn" class="btn btn-secondary">Refresh</button>
+                <button id="back-to-chat-btn" class="btn btn-primary">Back to Chat</button>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="conversations-sidebar">
+                <h2>Lead Conversations</h2>
+                <div id="conversations-list" class="conversations-list">
+                    <!-- Conversations will be loaded here -->
+                </div>
+                <div id="loading-indicator" class="loading-indicator">
+                    <div class="spinner"></div>
+                    <p>Loading lead conversations...</p>
+                </div>
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <p>No lead conversations found</p>
+                </div>
+            </div>
+
+            <div class="conversation-detail">
+                <div id="no-conversation-selected" class="no-selection">
+                    <h3>Select a lead conversation to view details</h3>
+                    <p>Choose a conversation from the list to see the lead's information and conversation history.</p>
+                </div>
+
+                <div id="conversation-view" class="conversation-view" style="display: none;">
+                    <div class="conversation-header">
+                        <h3 id="conversation-title">Conversation Details</h3>
+                        <div class="conversation-meta">
+                            <span id="conversation-date"></span>
+                            <span id="conversation-message-count"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="messages-container">
+                        <div id="messages-list" class="messages-list">
+                            <!-- Messages will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="conversation-actions">
+                        <button id="analyze-lead-btn" class="btn btn-primary">Analyze Lead</button>
+                        <button id="delete-conversation-btn" class="btn btn-danger">Delete Conversation</button>
+                        <button id="export-conversation-btn" class="btn btn-secondary">Export Messages</button>
+                    </div>
+
+                    <!-- Lead Analysis Results -->
+                    <div id="lead-analysis-section" class="lead-analysis-section" style="display: none;">
+                        <h3>Lead Analysis Results</h3>
+                        <div id="lead-analysis-content" class="lead-analysis-content">
+                            <!-- Lead analysis data will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>

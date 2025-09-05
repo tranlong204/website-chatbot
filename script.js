@@ -7,8 +7,9 @@
   // The frontend no longer holds the API key. It will call our backend proxy.
   const FIXED_BOT_REPLY = "Hi! I'm a demo bot. How can I help you today?";
   
-  // Store conversation history for context
-  let conversationHistory = [];
+  // Store conversations in a dictionary data structure
+  let conversations = {};
+  let currentConversationId = null;
 
   function appendMessage(role, text, isTyping = false) {
     const wrapper = document.createElement('div');
@@ -47,12 +48,143 @@
     }
   }
 
+  // Generate a unique conversation ID
+  function generateConversationId() {
+    return 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  // Create a new conversation
+  function createNewConversation() {
+    const conversationId = generateConversationId();
+    conversations[conversationId] = {
+      id: conversationId,
+      createdAt: new Date().toISOString(),
+      messages: []
+    };
+    currentConversationId = conversationId;
+    return conversationId;
+  }
+
+  // Get current conversation or create new one
+  function getCurrentConversation() {
+    if (!currentConversationId || !conversations[currentConversationId]) {
+      return createNewConversation();
+    }
+    return currentConversationId;
+  }
+
+  // Add message to current conversation
   function addToConversationHistory(role, content) {
-    conversationHistory.push({ role, content });
+    const convId = getCurrentConversation();
+    const message = { 
+      role, 
+      content, 
+      timestamp: new Date().toISOString() 
+    };
+    
+    conversations[convId].messages.push(message);
     
     // Keep only last 20 messages to prevent context from getting too long
-    if (conversationHistory.length > 20) {
-      conversationHistory = conversationHistory.slice(-20);
+    if (conversations[convId].messages.length > 20) {
+      conversations[convId].messages = conversations[convId].messages.slice(-20);
+    }
+  }
+
+  // Get conversation history for API
+  function getConversationHistory() {
+    const convId = getCurrentConversation();
+    return conversations[convId] ? conversations[convId].messages : [];
+  }
+
+  // Get all conversations
+  function getAllConversations() {
+    return conversations;
+  }
+
+  // Switch to a different conversation
+  function switchConversation(conversationId) {
+    if (conversations[conversationId]) {
+      currentConversationId = conversationId;
+      return true;
+    }
+    return false;
+  }
+
+  // Clear current conversation
+  function clearCurrentConversation() {
+    if (currentConversationId && conversations[currentConversationId]) {
+      conversations[currentConversationId].messages = [];
+    }
+  }
+
+  // API functions for conversation management
+  async function createConversationOnServer() {
+    try {
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.conversation;
+      }
+    } catch (err) {
+      console.error('Error creating conversation on server:', err);
+    }
+    return null;
+  }
+
+  async function getAllConversationsFromServer() {
+    try {
+      const response = await fetch('/api/conversations');
+      if (response.ok) {
+        const data = await response.json();
+        return data.conversations;
+      }
+    } catch (err) {
+      console.error('Error fetching conversations from server:', err);
+    }
+    return [];
+  }
+
+  async function getConversationFromServer(conversationId) {
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data.conversation;
+      }
+    } catch (err) {
+      console.error('Error fetching conversation from server:', err);
+    }
+    return null;
+  }
+
+  async function deleteConversationFromServer(conversationId) {
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}`, {
+        method: 'DELETE'
+      });
+      return response.ok;
+    } catch (err) {
+      console.error('Error deleting conversation from server:', err);
+      return false;
+    }
+  }
+
+  // Sync local conversations with server
+  async function syncConversationsWithServer() {
+    try {
+      const serverConversations = await getAllConversationsFromServer();
+      // Update local conversations with server data
+      serverConversations.forEach(serverConv => {
+        if (conversations[serverConv.id]) {
+          // Update existing conversation metadata
+          conversations[serverConv.id].createdAt = serverConv.createdAt;
+        }
+      });
+    } catch (err) {
+      console.error('Error syncing conversations with server:', err);
     }
   }
 
@@ -63,6 +195,9 @@
       // Add user message to conversation history
       addToConversationHistory('user', userText);
       
+      // Get current conversation history for API
+      const conversationHistory = getConversationHistory();
+      
       const response = await fetch(cfg.API_URL || '/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -72,7 +207,8 @@
           max_tokens: cfg.max_tokens,
           temperature: cfg.temperature,
           system_prompt: cfg.system_prompt,
-          conversation_history: conversationHistory
+          conversation_history: conversationHistory,
+          conversation_id: currentConversationId
         })
       });
       if (!response.ok) return FIXED_BOT_REPLY;
@@ -129,10 +265,33 @@
 
   formEl.addEventListener('submit', handleSubmit);
 
-  // Seed a welcome message and add to conversation history
-  const welcomeMessage = "Hello! I'm your website assistant. Ask me anything.";
+  // Dashboard button functionality
+  const dashboardBtn = document.getElementById('dashboard-btn');
+  if (dashboardBtn) {
+    dashboardBtn.addEventListener('click', () => {
+      window.location.href = 'dashboard.html';
+    });
+  }
+
+  // Initialize with a new conversation and welcome message
+  createNewConversation();
+  const welcomeMessage = "Hello! I'm the MindTek AI Assistant. I'm here to help you discover how AI can transform your business. What industry do you work in?";
   appendMessage('bot', welcomeMessage);
   addToConversationHistory('assistant', welcomeMessage);
+
+  // Sync with server on initialization
+  syncConversationsWithServer();
+
+  // Expose conversation management functions globally for debugging
+  window.conversationManager = {
+    getAllConversations,
+    getCurrentConversation,
+    switchConversation,
+    createNewConversation,
+    clearCurrentConversation,
+    syncConversationsWithServer,
+    conversations: () => conversations
+  };
 })();
 
 
