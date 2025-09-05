@@ -29,6 +29,7 @@ vercel
 
 # For production deployment
 vercel --prod
+
 ```
 
 ### Option B: Deploy from Vercel Dashboard
@@ -131,6 +132,12 @@ This will start a local server that mimics Vercel's serverless environment.
 
 After deployment, your app will be available at:
 `https://your-project-name.vercel.app`
+
+**Note**: If you see an authentication page, this means Vercel has enabled deployment protection. To disable it:
+1. Go to your Vercel dashboard
+2. Select your project
+3. Go to Settings → Security
+4. Disable "Deployment Protection" or add your domain to the bypass list
 
 ## Support
 
