@@ -4,14 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "dev": "echo 'Use npx vercel dev to start development server'",
     "build": "echo 'No build step required'",
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "start": "echo 'Use npx vercel dev to start development server'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
