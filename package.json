@@ -4,10 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "echo 'Use npx vercel dev to start development server'",
+    "dev": "echo 'Use npm run dev:all to run both backend and frontend'",
+    "dev:api": "vercel dev --port 3000",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:all": "node -e \"(async()=>{const {spawn}=await import('node:child_process'); const a=spawn('npx',[ '--yes','vercel','dev','--port','3000','--confirm' ],{stdio:'inherit'}); const f=spawn('npm',[ 'run','dev','--prefix','frontend' ],{stdio:'inherit'}); a.on('exit', code=>process.exitCode=code||0); f.on('exit', code=>process.exitCode=(process.exitCode||0)||(code||0));})();\"",
     "build": "echo 'No build step required'",
     "deploy": "vercel --prod",
-    "start": "echo 'Use npx vercel dev to start development server'"
+    "start": "echo 'Use npm run dev:all to start both backend and frontend'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
