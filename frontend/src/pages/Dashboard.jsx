@@ -32,7 +32,14 @@ export default function Dashboard() {
       const res = await fetch('/api/conversations')
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = await res.json()
-      setConversations(data.conversations || [])
+      const list = data.conversations || []
+      setConversations(list)
+      // If a conversation is currently selected, refresh its details as well
+      if (selectedId) {
+        try {
+          await selectConversation(selectedId)
+        } catch {}
+      }
     } catch (e) {
       setError('Failed to load conversations. Please try again.')
     } finally {
