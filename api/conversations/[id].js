@@ -1,4 +1,4 @@
-import { getConversationFromSupabase, deleteConversationFromSupabase } from '../_lib/supabase.js';
+import { getConversationFromSupabase, deleteConversationFromSupabase, updateConversationInSupabase } from '../_lib/supabase.js';
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -31,6 +31,21 @@ export default async function handler(req, res) {
         res.status(404).json({ error: 'Conversation not found' });
       }
       
+    } else if (req.method === 'POST') {
+      // Update/replace messages for a conversation (used to persist welcome message)
+      const { messages } = req.body || {};
+      if (!Array.isArray(messages)) {
+        res.status(400).json({ error: 'messages must be an array' });
+        return;
+      }
+
+      const updated = await updateConversationInSupabase(id, messages);
+      if (updated) {
+        res.json({ conversation: { id: updated.conversation_id, createdAt: updated.created_at, messages: updated.messages || [] } });
+      } else {
+        res.status(404).json({ error: 'Conversation not found' });
+      }
+
     } else if (req.method === 'DELETE') {
       // Delete conversation
       const supabaseDeleted = await deleteConversationFromSupabase(id);

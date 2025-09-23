@@ -18,6 +18,14 @@ export default function Chat() {
         if (res.ok) {
           const data = await res.json()
           setConversationId(data?.conversation?.id)
+          // Persist the initial welcome message immediately so dashboard shows it
+          try {
+            await fetch(`/api/conversations/${data?.conversation?.id}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ messages: [{ role: 'assistant', content: welcome, timestamp: new Date().toISOString() }] })
+            })
+          } catch {}
         }
       } catch (e) {
         // non-fatal; chatting still works
