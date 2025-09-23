@@ -8,6 +8,23 @@ export default function Dashboard() {
   const [analysis, setAnalysis] = useState(null)
   const [error, setError] = useState('')
 
+  // Ensure original dashboard styling is applied only on this page
+  useEffect(() => {
+    const id = 'dashboard-css-link'
+    let link = document.getElementById(id)
+    if (!link) {
+      link = document.createElement('link')
+      link.id = id
+      link.rel = 'stylesheet'
+      link.href = '/dashboard.css'
+      document.head.appendChild(link)
+    }
+    return () => {
+      const existing = document.getElementById(id)
+      if (existing) existing.remove()
+    }
+  }, [])
+
   async function loadConversations() {
     try {
       setLoading(true)
