@@ -5,11 +5,24 @@ export default function Chat() {
   const [inputValue, setInputValue] = useState('')
   const [messages, setMessages] = useState([])
   const [isSending, setIsSending] = useState(false)
+  const [conversationId, setConversationId] = useState(null)
   const messagesRef = useRef(null)
 
   useEffect(() => {
     const welcome = "Hello! I'm the MindTek AI Assistant. I'm here to help you discover how AI can transform your business. What industry do you work in?"
     setMessages([{ role: 'assistant', content: welcome, timestamp: new Date().toISOString() }])
+    // Create a server-side conversation so messages persist to DB
+    ;(async () => {
+      try {
+        const res = await fetch('/api/conversations', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+        if (res.ok) {
+          const data = await res.json()
+          setConversationId(data?.conversation?.id)
+        }
+      } catch (e) {
+        // non-fatal; chatting still works
+      }
+    })()
   }, [])
 
   useEffect(() => {
@@ -31,10 +44,19 @@ export default function Chat() {
       const res = await fetch(cfg.API_URL || '/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, model: cfg.model, max_tokens: cfg.max_tokens, temperature: cfg.temperature, system_prompt: cfg.system_prompt })
+        body: JSON.stringify({
+          message: text,
+          model: cfg.model,
+          max_tokens: cfg.max_tokens,
+          temperature: cfg.temperature,
+          system_prompt: cfg.system_prompt,
+          conversation_history: messages.map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content })),
+          conversation_id: conversationId
+        })
       })
       const data = res.ok ? await res.json() : { reply: "Hi! I'm a demo bot. How can I help you today?" }
       const reply = data?.reply || "Hi! I'm a demo bot. How can I help you today?"
+      if (!conversationId && data?.conversation_id) setConversationId(data.conversation_id)
       setMessages((prev) => [...prev, { role: 'assistant', content: reply, timestamp: new Date().toISOString() }])
     } catch (e) {
       setMessages((prev) => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.', timestamp: new Date().toISOString() }])
