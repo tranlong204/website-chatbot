@@ -14,16 +14,16 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      // Get all conversations
+      // Get all conversations and hide empty ones (0 messages)
       const supabaseConversations = await getAllConversationsFromSupabase();
-      
-      const conversationList = supabaseConversations.map(conv => ({
-        id: conv.conversation_id,
-        createdAt: conv.created_at,
-        messageCount: conv.messages ? conv.messages.length : 0,
-        lastMessage: conv.messages && conv.messages.length > 0 ? conv.messages[conv.messages.length - 1] : null
-      }));
-      
+      const conversationList = (supabaseConversations || [])
+        .filter(conv => Array.isArray(conv.messages) && conv.messages.length > 0)
+        .map(conv => ({
+          id: conv.conversation_id,
+          createdAt: conv.created_at,
+          messageCount: conv.messages.length,
+          lastMessage: conv.messages[conv.messages.length - 1]
+        }));
       res.json({ conversations: conversationList });
       
     } else if (req.method === 'POST') {
