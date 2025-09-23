@@ -5,16 +5,11 @@
       "runtime": "@vercel/node@4.0.0"
     }
   },
-  "buildCommand": "echo 'No build required'",
-  "outputDirectory": "public",
+  "buildCommand": "npm --prefix frontend ci && npm --prefix frontend run build",
+  "outputDirectory": "frontend/dist",
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/$1"
-    }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*\\..*)", "dest": "/$1" },
+    { "src": "/.*", "dest": "/index.html" }
   ]
 }
